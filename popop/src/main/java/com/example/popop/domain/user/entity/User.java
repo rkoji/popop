@@ -1,30 +1,43 @@
 package com.example.popop.domain.user.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import com.example.popop.global.common.BaseTimeEntity;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
+@Builder
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Entity
-public class User {
+public class User extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    private String login_id;
+    @Column(nullable = false,unique = true)
+    private String loginId;
+
+    @Column(nullable = false)
     private String name;
+
+    @Column(nullable = false,unique = true)
     private String nickname;
-    private int password;
+
+    @Column(nullable = false)
+    private String password;
+
+    @Column(nullable = false,unique = true)
     private String email;
-    private boolean enabled;
-    private Rule rule;
+
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
+
 
 
 }

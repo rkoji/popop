@@ -1,10 +1,16 @@
 package com.example.popop.domain.user.service.impl;
 
+import com.example.popop.domain.user.dto.LogInDto;
 import com.example.popop.domain.user.dto.UserDto;
+import com.example.popop.domain.user.dto.UserLoginDto;
+import com.example.popop.domain.user.entity.User;
 import com.example.popop.domain.user.repository.UserRepository;
 import com.example.popop.domain.user.service.UserService;
 import com.example.popop.global.exception.CustomException;
+import com.example.popop.global.exception.ErrorCode;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +21,9 @@ import static com.example.popop.global.exception.ErrorCode.*;
 public class UserServiceImpl implements UserService {
 
     private UserRepository userRepository;
+    private final AuthenticationManagerBuilder authenticationManagerBuilder;
 
+    // 회원가입
     @Override
     public void singUpUser(UserDto userDto) {
 
@@ -43,5 +51,19 @@ public class UserServiceImpl implements UserService {
         String encodePwd = encoder.encode(password);
 
         userRepository.save(userDto.toEntity(encodePwd));
+    }
+
+    // 로그인
+    @Override
+    public void loginUser(UserLoginDto userLoginDto) {
+        User user = userRepository.findByLoginId(userLoginDto.getLoginId())
+                .orElseThrow(() -> new CustomException(NO_EXISTS_ID));
+
+        String enteredPassword = userLoginDto.getPassword();
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        if (!encoder.matches(enteredPassword, user.getPassword())) {
+            throw new CustomException(PASSWORD_MISMATCH);
+        }
     }
 }

@@ -19,25 +19,37 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(nullable = false,unique = true)
+    @Column(unique = true)
     private String loginId;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false,unique = true)
+    @Column(unique = true)
     private String nickname;
 
-    @Column(nullable = false)
+    @Column
     private String password;
 
     @Column(nullable = false,unique = true)
     private String email;
 
+    private String picture;
+
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     private Role role;
 
+    public User update(String name, String picture) {
+        this.name = name;
+        this.picture = picture;
 
+        return this;
+    }
+
+    public String getRoleKey(){
+        return this.role.getKey();
+    }
 
 
 }

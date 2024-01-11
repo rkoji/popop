@@ -1,6 +1,5 @@
 package com.example.popop.global.config;
 
-import com.example.popop.domain.user.entity.Role;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -23,31 +22,28 @@ import java.io.PrintWriter;
 @EnableWebSecurity
 public class SpringSecurity {
 
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf((csrfConfig) ->
-                        csrfConfig.disable())
-                .headers((headerConfig) ->
-                        headerConfig.frameOptions(frameOptionsConfig ->
-                                frameOptionsConfig.disable()
-                        )
-                )
-                .authorizeHttpRequests((authorizeRequests)->
+                .csrf(c -> c.disable())
+                .headers(c -> c.frameOptions(f -> f.disable()).disable())
+                .authorizeHttpRequests((authorizeRequests) ->
                         authorizeRequests
-                                .requestMatchers("/","/login/**","/signUp").permitAll()
-                                .requestMatchers("/user/**").hasRole(Role.USER.name())
-                                .requestMatchers("/admin/**").hasRole(Role.ADMIN.name())
-                                .anyRequest().authenticated()
+                                .requestMatchers("/", "/login/**", "/oauth2/** ", "/signUp").permitAll()
+                                .requestMatchers("/user/**").hasRole("USER")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .anyRequest().permitAll()
                 )
-                .exceptionHandling((exceptionConfig)->
+                .exceptionHandling((exceptionConfig) ->
                         exceptionConfig.authenticationEntryPoint(unauthorizedEntryPoint).accessDeniedHandler(accessDeniedHandler)
                 );
         return http.build();
     }
+
     private final AuthenticationEntryPoint unauthorizedEntryPoint =
             (request, response, authException) -> {
-                ErrorResponse fail = new ErrorResponse(HttpStatus.UNAUTHORIZED, "인증되지 않았습니다.");
+                ErrorResponse fail = new ErrorResponse(HttpStatus.UNAUTHORIZED, "Not authenticated");
                 response.setStatus(HttpStatus.UNAUTHORIZED.value());
                 String json = new ObjectMapper().writeValueAsString(fail);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -58,7 +54,7 @@ public class SpringSecurity {
 
     private final AccessDeniedHandler accessDeniedHandler =
             (request, response, accessDeniedException) -> {
-                ErrorResponse fail = new ErrorResponse(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+                ErrorResponse fail = new ErrorResponse(HttpStatus.FORBIDDEN, "Not permission");
                 response.setStatus(HttpStatus.FORBIDDEN.value());
                 String json = new ObjectMapper().writeValueAsString(fail);
                 response.setContentType(MediaType.APPLICATION_JSON_VALUE);
@@ -76,7 +72,7 @@ public class SpringSecurity {
     }
 
     @Bean
-    PasswordEncoder passwordEncoder(){
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 

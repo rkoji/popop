@@ -20,9 +20,10 @@ public class JwtUtil {
                 .getBody().getExpiration().before(new Date());
     }
 
-    public static String createJwt(String loginId, String secretKey, Long expiredMs) {
+    public static String createJwt(String loginId,String role, String secretKey, Long expiredMs) {
         Claims claims = Jwts.claims();
         claims.put("loginId", loginId);
+        claims.put("role", role);
 
         return Jwts.builder()
                 .setClaims(claims)

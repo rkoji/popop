@@ -71,6 +71,6 @@ public class UserServiceImpl implements UserService {
             throw new CustomException(PASSWORD_MISMATCH);
         }
 
-        return JwtUtil.createJwt(user.getLoginId(), secretKey, expiredMs);
+        return JwtUtil.createJwt(user.getLoginId(),user.getRoleKey(), secretKey, expiredMs);
     }
 }

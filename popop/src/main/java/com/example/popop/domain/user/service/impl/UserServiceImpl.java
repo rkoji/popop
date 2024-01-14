@@ -1,27 +1,30 @@
 package com.example.popop.domain.user.service.impl;
 
-import com.example.popop.domain.user.dto.LogInDto;
 import com.example.popop.domain.user.dto.UserDto;
 import com.example.popop.domain.user.dto.UserLoginDto;
 import com.example.popop.domain.user.entity.User;
 import com.example.popop.domain.user.repository.UserRepository;
 import com.example.popop.domain.user.service.UserService;
 import com.example.popop.global.exception.CustomException;
-import com.example.popop.global.exception.ErrorCode;
-import jakarta.transaction.Transactional;
-import lombok.AllArgsConstructor;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import com.example.popop.global.jwt.JwtUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.example.popop.global.exception.ErrorCode.*;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final UserRepository userRepository;
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    private Long expiredMs = 1000 * 60 * 60l;
 
     // 회원가입
     @Override
@@ -53,9 +56,11 @@ public class UserServiceImpl implements UserService {
         userRepository.save(userDto.toEntity(encodePwd));
     }
 
-    // 로그인
+
+    //  로그인
+    @Transactional
     @Override
-    public void loginUser(UserLoginDto userLoginDto) {
+    public String loginUser(UserLoginDto userLoginDto) {
         User user = userRepository.findByLoginId(userLoginDto.getLoginId())
                 .orElseThrow(() -> new CustomException(NO_EXISTS_ID));
 
@@ -65,5 +70,7 @@ public class UserServiceImpl implements UserService {
         if (!encoder.matches(enteredPassword, user.getPassword())) {
             throw new CustomException(PASSWORD_MISMATCH);
         }
+
+        return JwtUtil.createJwt(user.getLoginId(), secretKey, expiredMs);
     }
 }

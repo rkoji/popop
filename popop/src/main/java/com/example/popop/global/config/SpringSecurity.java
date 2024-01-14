@@ -1,19 +1,25 @@
 package com.example.popop.global.config;
 
+import com.example.popop.domain.user.service.UserService;
+import com.example.popop.global.jwt.JwtFilter;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.PrintWriter;
 
@@ -22,19 +28,24 @@ import java.io.PrintWriter;
 @EnableWebSecurity
 public class SpringSecurity {
 
+    private final UserService userService;
+
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(c -> c.disable())
-                .headers(c -> c.frameOptions(f -> f.disable()).disable())
+                .csrf(AbstractHttpConfigurer::disable)
+                .headers(c -> c.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable).disable())
                 .authorizeHttpRequests((authorizeRequests) ->
-                        authorizeRequests
-                                .requestMatchers("/", "/login/**", "/oauth2/** ", "/signUp").permitAll()
-                                .requestMatchers("/user/**").hasRole("USER")
-                                .requestMatchers("/admin/**").hasRole("ADMIN")
-                                .anyRequest().permitAll()
+                                authorizeRequests
+                                        .requestMatchers("/", "/login/**", "/oauth2/** ", "/signup").permitAll()
+//                                .requestMatchers("/posts/**").hasRole("USER")
+                                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                                        .anyRequest().authenticated()
                 )
+                .addFilterBefore(new JwtFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exceptionConfig) ->
                         exceptionConfig.authenticationEntryPoint(unauthorizedEntryPoint).accessDeniedHandler(accessDeniedHandler)
                 );

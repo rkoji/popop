@@ -54,7 +54,7 @@ class UserControllerTest {
                 .nickname("mm")
                 .password("re123")
                 .email("mark@gmail.com")
-                .role(Role.USER)
+                .role(Role.ROLE_USER)
                 .build();
 
         url = url + port + "/signup";

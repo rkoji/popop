@@ -44,7 +44,7 @@ public class UserDto {
                 .nickname(nickname)
                 .password(encodePwd)
                 .email(email)
-                .role(Role.USER)
+                .role(Role.ROLE_USER)
                 .build();
     }
 

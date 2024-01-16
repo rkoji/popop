@@ -1,5 +1,6 @@
 package com.example.popop.global.jwt;
 
+import com.example.popop.domain.user.entity.User;
 import com.example.popop.domain.user.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,14 +17,17 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final UserService userService;
+    private static final String BEARER_PREFIX = "Bearer ";
 
     @Value("${jwt.secret}")
     private final String secretKey;
+    private final JwtUtil jwtUtil;
+    private final UserService userService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -39,22 +43,30 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         // token 꺼내기
-        String token = authorization.split(" ")[1];
+//        String token = authorization.split(" ")[1];
+        String token = authorization.substring("Bearer ".length());
         logger.info("token : " + token);
 
+
         // token Expired되었는지
-        if (JwtUtil.isExpired(token, secretKey)) {
+        if (jwtUtil.isExpired(token)) {
             logger.error("Token이 만료 되었습니다.");
             filterChain.doFilter(request, response);
             return;
         }
 
-        String loginId = JwtUtil.getLonginId(token, secretKey);
+
+        String loginId = jwtUtil.getLoginId(token);
         logger.info("loginId : " + loginId);
 
+        User loginUser = userService.getLoginId(loginId);
+
         UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(loginId, null, List.of(new SimpleGrantedAuthority("USER")));
+                new UsernamePasswordAuthenticationToken(loginUser.getLoginId(), null
+                        , List.of(new SimpleGrantedAuthority(loginUser.getRole().name())));
         authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+        // 권한 부여
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         filterChain.doFilter(request, response);
     }

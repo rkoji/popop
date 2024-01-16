@@ -15,7 +15,10 @@ public enum ErrorCode {
     DUPLICATE_EMAIL(BAD_REQUEST, "이미 등록된 이메일이 있습니다."),
     DUPLICATE_USER_ID(BAD_REQUEST, "이미 등록된 아이디가 있습니다."),
     NO_EXISTS_ID(NOT_FOUND,"존재하지 않는 아이디입니다."),
-    PASSWORD_MISMATCH(NOT_FOUND, "비밀번호가 일치하지 않습니다.");
+    PASSWORD_MISMATCH(NOT_FOUND, "비밀번호가 일치하지 않습니다."),
+    NO_EXISTS_POST_ID(NOT_FOUND, "게시글이 존재하지 않습니다"),
+    USER_MISTMATCH(NOT_FOUND, "일치하지 않는 회원입니다")
+    ;
 
     private final HttpStatus httpStatus;
     private final String message;

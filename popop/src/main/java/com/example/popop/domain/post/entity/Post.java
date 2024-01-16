@@ -1,5 +1,6 @@
 package com.example.popop.domain.post.entity;
 
+import com.example.popop.domain.post.dto.ModifyPostDto;
 import com.example.popop.domain.user.entity.User;
 import com.example.popop.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
@@ -47,4 +48,41 @@ public class Post extends BaseTimeEntity {
 
     private LocalDate popupEndDate;
 
+    public Boolean getIsPopup() {
+        return isPopup;
+    }
+
+    public void setIsPopup(Boolean isPopup) {
+        this.isPopup = isPopup;
+    }
+
+    // 게시글 수정
+    public void modifyPostForm(ModifyPostDto dto) {
+        if (dto.getTitle() != null) {
+            this.title = dto.getTitle();
+        }
+        if (dto.getContent() != null) {
+            this.content = dto.getContent();
+        }
+        if (dto.getAddress() != null) {
+            this.address = dto.getAddress();
+        }
+        if (dto.getStatus() != null) {
+            this.status = dto.getStatus();
+        }
+        if (dto.getIsPopup() != null) {
+            this.isPopup = dto.getIsPopup();
+        }
+        if (dto.getPopupStartDate() != null) {
+            this.popupStartDate = dto.getPopupStartDate();
+        }
+        if (dto.getPopupEndDate() != null) {
+            this.popupEndDate = dto.getPopupEndDate();
+        }
+    }
+
+    // 사진 수정
+    public void modifyAttachments(String attachments) {
+        this.attachments = attachments;
+    }
 }

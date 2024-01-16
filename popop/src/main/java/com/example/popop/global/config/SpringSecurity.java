@@ -2,6 +2,7 @@ package com.example.popop.global.config;
 
 import com.example.popop.domain.user.service.UserService;
 import com.example.popop.global.jwt.JwtFilter;
+import com.example.popop.global.jwt.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import java.io.PrintWriter;
 public class SpringSecurity {
 
     private final UserService userService;
+    private final JwtUtil jwtUtil;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -39,13 +41,13 @@ public class SpringSecurity {
                 .csrf(AbstractHttpConfigurer::disable)
                 .headers(c -> c.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable).disable())
                 .authorizeHttpRequests((authorizeRequests) ->
-                                authorizeRequests
-                                        .requestMatchers("/", "/login/**", "/oauth2/** ", "/signup").permitAll()
-//                                .requestMatchers("/posts/**").hasRole("USER")
-                                        .requestMatchers("/admin/**").hasRole("ADMIN")
-                                        .anyRequest().authenticated()
+                        authorizeRequests
+                                .requestMatchers("/", "/login/**", "/oauth2/** ", "/signup").permitAll()
+                                .requestMatchers("/posts/**").hasRole("USER")
+                                .requestMatchers("/admin/**").hasRole("ADMIN")
+                                .anyRequest().authenticated()
                 )
-                .addFilterBefore(new JwtFilter(userService, secretKey), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtFilter(secretKey, jwtUtil, userService), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling((exceptionConfig) ->
                         exceptionConfig.authenticationEntryPoint(unauthorizedEntryPoint).accessDeniedHandler(accessDeniedHandler)
                 );

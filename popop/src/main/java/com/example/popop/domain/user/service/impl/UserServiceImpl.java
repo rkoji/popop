@@ -20,6 +20,7 @@ import static com.example.popop.global.exception.ErrorCode.*;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final JwtUtil jwtUtil;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -71,6 +72,12 @@ public class UserServiceImpl implements UserService {
             throw new CustomException(PASSWORD_MISMATCH);
         }
 
-        return JwtUtil.createJwt(user.getLoginId(),user.getRoleKey(), secretKey, expiredMs);
+        return jwtUtil.createJwt(user.getLoginId(),user.getRoleKey(), expiredMs);
+    }
+
+    @Override
+    public User getLoginId(String loginId) {
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(NO_EXISTS_ID));
+        return user;
     }
 }

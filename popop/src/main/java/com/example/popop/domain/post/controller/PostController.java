@@ -50,4 +50,13 @@ public class PostController {
         postService.modifyPost(postId, modifyPostDto, file, token);
         return new ResponseEntity<>(OK);
     }
+
+    // 게시글 삭제
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> PostDelete(@PathVariable Long postId,
+                                           @RequestHeader(name = AUTHORIZATION) String auth) {
+        String token = token(auth);
+        postService.deletePost(postId, token);
+        return new ResponseEntity<>(OK);
+    }
 }

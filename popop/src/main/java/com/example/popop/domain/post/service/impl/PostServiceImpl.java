@@ -72,5 +72,17 @@ public class PostServiceImpl implements PostService {
             post.modifyPostForm(modifyPostDto);
         }
     }
+
+    // 게시글 삭제
+    @Override
+    public void deletePost(Long postId, String token) {
+        String loginId = jwtUtil.getLoginId(token);
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(NO_EXISTS_ID));
+        Post post = postRepository.findByAuthor(user).orElseThrow(() -> new CustomException(USER_MISTMATCH));
+
+        Post existPost
+                = postRepository.findById(postId).orElseThrow(() -> new CustomException(NO_EXISTS_POST_ID));
+        postRepository.delete(existPost);
+    }
 }
 

@@ -11,4 +11,6 @@ public interface PostService {
     void createPost(CreatePostDto createPostDto , MultipartFile file, String token);
 
     void modifyPost(Long postId, ModifyPostDto modifyPostDto, MultipartFile file, String token);
+
+    void deletePost(Long postId, String token);
 }

@@ -10,7 +10,6 @@ import com.example.popop.domain.post.service.PostService;
 import com.example.popop.domain.user.entity.User;
 import com.example.popop.domain.user.repository.UserRepository;
 import com.example.popop.global.exception.CustomException;
-import com.example.popop.global.exception.ErrorCode;
 import com.example.popop.global.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import static com.example.popop.global.exception.ErrorCode.*;
-import static com.example.popop.global.exception.ErrorCode.NO_EXISTS_ID;
 
 @RequiredArgsConstructor
 @Service
@@ -83,6 +81,18 @@ public class PostServiceImpl implements PostService {
         Post existPost
                 = postRepository.findById(postId).orElseThrow(() -> new CustomException(NO_EXISTS_POST_ID));
         postRepository.delete(existPost);
+    }
+
+    // 좋아요 추가
+    @Override
+    public void addLike(Long postId, String token) {
+        String loginId = jwtUtil.getLoginId(token);
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(NO_EXISTS_ID));
+        Post post = postRepository.findByAuthor(user).orElseThrow(() -> new CustomException(USER_MISTMATCH));
+
+        if (post.addLike(user)) {
+            postRepository.save(post);
+        }
     }
 }
 

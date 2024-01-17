@@ -4,9 +4,14 @@ import com.example.popop.domain.post.dto.ModifyPostDto;
 import com.example.popop.domain.user.entity.User;
 import com.example.popop.global.common.BaseTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 import static jakarta.persistence.EnumType.STRING;
 import static jakarta.persistence.GenerationType.IDENTITY;
@@ -36,6 +41,14 @@ public class Post extends BaseTimeEntity {
     private String address;
 
     private String attachments;
+
+    @ManyToMany
+    @JoinTable(
+            name = "likesUser",
+            joinColumns = @JoinColumn(name="post_id"),
+            inverseJoinColumns = @JoinColumn(name = "user_id")
+    )
+    private Set<User> likesUser =new HashSet<>();
 
     private int likesCount = 0;
 
@@ -84,5 +97,14 @@ public class Post extends BaseTimeEntity {
     // 사진 수정
     public void modifyAttachments(String attachments) {
         this.attachments = attachments;
+    }
+
+    // 좋아요 추가
+    public boolean addLike(User user) {
+        if (likesUser.add(user)) {
+            likesCount++;
+            return true;
+        }
+        return false;
     }
 }

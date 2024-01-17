@@ -13,4 +13,6 @@ public interface PostService {
     void modifyPost(Long postId, ModifyPostDto modifyPostDto, MultipartFile file, String token);
 
     void deletePost(Long postId, String token);
+
+    void addLike(Long postId, String token);
 }

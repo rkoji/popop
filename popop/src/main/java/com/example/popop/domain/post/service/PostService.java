@@ -15,4 +15,6 @@ public interface PostService {
     void deletePost(Long postId, String token);
 
     void addLike(Long postId, String token);
+
+    void deleteLike(Long postId, String token);
 }

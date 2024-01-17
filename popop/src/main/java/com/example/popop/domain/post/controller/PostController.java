@@ -68,4 +68,13 @@ public class PostController {
         postService.addLike(postId, token);
         return ResponseEntity.ok("좋아요가 추가되었습니다");
     }
+
+    // 좋아요 삭제
+    @DeleteMapping("/{postId}/likes")
+    public ResponseEntity<String> deleteLike(@PathVariable Long postId,
+                                            @RequestHeader(name = AUTHORIZATION) String auth) {
+        String token = token(auth);
+        postService.deleteLike(postId, token);
+        return ResponseEntity.ok("좋아요가 삭제되었습니다");
+    }
 }

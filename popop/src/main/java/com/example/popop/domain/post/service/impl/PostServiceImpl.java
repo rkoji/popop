@@ -94,5 +94,17 @@ public class PostServiceImpl implements PostService {
             postRepository.save(post);
         }
     }
+
+    // 좋아요 삭제
+    @Override
+    public void deleteLike(Long postId, String token) {
+        String loginId = jwtUtil.getLoginId(token);
+        User user = userRepository.findByLoginId(loginId).orElseThrow(() -> new CustomException(NO_EXISTS_ID));
+        Post post = postRepository.findByAuthor(user).orElseThrow(() -> new CustomException(USER_MISTMATCH));
+
+        if (post.deleteLike(user)) {
+            postRepository.save(post);
+        }
+    }
 }
 

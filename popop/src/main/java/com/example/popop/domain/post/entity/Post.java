@@ -107,4 +107,13 @@ public class Post extends BaseTimeEntity {
         }
         return false;
     }
+
+    // 좋아요 삭제
+    public boolean deleteLike(User user) {
+            if (likesUser.remove(user)) {
+                likesCount--;
+                return true;
+            }
+            return false;
+    }
 }

@@ -52,6 +52,8 @@ public class Post extends BaseTimeEntity {
 
     private int likesCount = 0;
 
+    private int viewsCount = 0;
+
     @Enumerated(STRING)
     private PostStatus status;
 

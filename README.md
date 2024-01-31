@@ -11,4 +11,3 @@
 ### 🛠 Stacks
 --------
 #### Environment
-<img src="https://img.shields.io/badge/intellijidea-#000000?style=for-the-badge&logo=intellijidea&logoColor=white">
